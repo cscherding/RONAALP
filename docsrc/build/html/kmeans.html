@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-Means &mdash; RONAALP  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Kernel functions" href="kernels.html" />
+    <link rel="prev" title="Newman’s clustering algorithm" href="newman.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RONAALP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="RONAALP.html">RONAALP Algorithm</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="train.html">Training</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="encoder.html">Encoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="newman.html">Newman’s clustering algorithm</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">K-Means</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.html">Kernel functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="evaluate.html">Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update.html">Update</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RONAALP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="RONAALP.html">RONAALP Algorithm</a></li>
+          <li class="breadcrumb-item"><a href="train.html">Training</a></li>
+      <li class="breadcrumb-item active">K-Means</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/kmeans.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-RONAALP.utilities.online_kmeans">
+<span id="k-means"></span><h1>K-Means<a class="headerlink" href="#module-RONAALP.utilities.online_kmeans" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="RONAALP.utilities.online_kmeans.K_Means">
+<em class="property">class </em><code class="sig-prename descclassname">RONAALP.utilities.online_kmeans.</code><code class="sig-name descname">K_Means</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">n_knn</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/online_kmeans.html#K_Means"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.online_kmeans.K_Means" title="Permalink to this definition">¶</a></dt>
+<dd><p>K-means clustering custom class based on skicit-learn version augmented with a sequential (online) update procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>k</strong><span class="classifier">int, default = 2</span></dt><dd><p>The number of clusters to form as well as the number of
+centroids to generate.</p>
+</dd>
+<dt><strong>max_iter</strong><span class="classifier">int, default=300</span></dt><dd><p>Maximum number of iterations of the k-means algorithm for a
+single run.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, default=1e-3</span></dt><dd><p>Relative tolerance with regards to Frobenius norm of the difference
+in the cluster centers of two consecutive iterations to declare
+convergence.</p>
+</dd>
+<dt><strong>n_knn</strong><span class="classifier">int, default=5</span></dt><dd><p>Number of centroid neighbors to consider when computing the mean inter cluster distance.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>centroids</strong><span class="classifier">ndarray of shape (k, n_features)</span></dt><dd><p>Coordinates of cluster centers. If the algorithm stops before fully
+converging (see <code class="docutils literal notranslate"><span class="pre">tol</span></code> and <code class="docutils literal notranslate"><span class="pre">max_iter</span></code>), these will not be
+consistent with <code class="docutils literal notranslate"><span class="pre">labels_</span></code>.</p>
+</dd>
+<dt><strong>labels_</strong><span class="classifier">ndarray of shape (n_samples)</span></dt><dd><p>Labels of each point.</p>
+</dd>
+<dt><strong>delta</strong><span class="classifier">float</span></dt><dd><p>Mean of inter cluster distance.</p>
+</dd>
+<dt><strong>counts</strong><span class="classifier">ndarray of shape (k,)</span></dt><dd><p>Number of data point belonging to each cluster.</p>
+</dd>
+<dt><strong>nearest_C</strong><span class="classifier">Sklearn nearest neighbor object</span></dt><dd><p>Nearest neighbor graph fitted on k-means centroid.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="RONAALP.utilities.online_kmeans.K_Means.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/online_kmeans.html#K_Means.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.online_kmeans.K_Means.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit kmeans centroids to data using sklearns implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">ndarray, shape (n_samples, n_features,)</span></dt><dd><p>Array of points to divide in k clusters.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.online_kmeans.K_Means.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/online_kmeans.html#K_Means.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.online_kmeans.K_Means.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict within which cluster lie new data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">ndarray, shape (n_samples, n_features,)</span></dt><dd><p>Array of points to classify.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.online_kmeans.K_Means.set_delta">
+<code class="sig-name descname">set_delta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_delta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/online_kmeans.html#K_Means.set_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.online_kmeans.K_Means.set_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update delta parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.online_kmeans.K_Means.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/online_kmeans.html#K_Means.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.online_kmeans.K_Means.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequentially update the clustering using online k-means version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>new_data</strong><span class="classifier">ndarray, shape (n_samples2, n_features,)</span></dt><dd><p>Array of points to sequentially clusterize.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r51daf76ebaf4-1"><span class="brackets">1</span></dt>
+<dd><p>Hart, P. E., Stork, D. G., &amp; Duda, R. O. (2000). Pattern classification. Hoboken: Wiley.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="newman.html" class="btn btn-neutral float-left" title="Newman’s clustering algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kernels.html" class="btn btn-neutral float-right" title="Kernel functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clement Scherding.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

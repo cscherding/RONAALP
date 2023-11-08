@@ -1,0 +1,65 @@
+Kernel functions
+----------------
+
+.. image:: https://zenodo.org/badge/337030866.svg
+:target: https://zenodo.org/badge/latestdoi/337030866
+
+
+Here we provide a description of the different classes used to build
+and evaluate the RBF surrogate models. Two different
+kernel functions :math:`\phi(r)` are defined in the code, the Exponential
+kernel (:class:`RBF_Exponential <.utilities.kernels.exponential.RBF_Exponential>`, ,
+the Spline kernel (:class:`RBF_Spline <.utilities.kernels.spline.RBF_Spline>`).
+
+The ``fit`` method of these classes solves the system :math:`A s = F`.
+In the case of RBF interpolants, the vector :math:`F` contains the values
+of the function where the points have been evaluated and the matrix :math:`A`
+is defined as:
+
+.. math::
+    A = \begin{bmatrix}
+            \Phi & P \\
+            P^T & 0.
+        \end{bmatrix}
+
+The matrix :math:`\Phi` is defined as:
+
+.. math::
+    \Phi_{i,j} = \phi(r_{i,j}),
+
+where :math:`r_{i,j} = \left \| x^i-x^j \right\|` is the Euclidean distance
+between the points :math:`x^i` and :math:`x^j`.
+
+Once the ``fit`` method has been used to build the surrogate model, it is possible
+to evaluate points using the method ``evaluate``.
+
+If new points are generated, the
+
+
+Exponential Kernel
+~~~~~~~~~~~~~~~~~~
+The Exponential Kernel is defined as follows:
+
+.. math::
+    \Phi(r) = \exp \left( -\dfrac{r^2}{2 l^2} \right),
+    
+where :math:`l>0` and :math:`r=\|y-x\|`, where :math:`\|\cdot\|` is the
+Euclidean norm.
+
+.. automodule:: RONAALP.utilities.kernels.exponential
+    :members:
+
+Spline Kernel
+~~~~~~~~~~~~~
+The thin-plate spline kernel is defined as follows:
+
+.. math::
+    \Phi(r) = r^2 \log \left(r\right),
+
+where :math:`r=\|y-x\|`, where :math:`\|\cdot\|` is the Euclidean norm.
+
+The first derivative of the Matérn Kernel with respect to the
+distance is defined as:
+
+.. automodule:: RONAALP.utilities.kernels.spline
+    :members:

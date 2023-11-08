@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kernel functions &mdash; RONAALP  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RONAALP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RONAALP.html">RONAALP Algorithm</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RONAALP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Kernel functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ktrain.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="kernel-functions">
+<h1>Kernel functions<a class="headerlink" href="#kernel-functions" title="Permalink to this headline">¶</a></h1>
+<img alt="https://zenodo.org/badge/337030866.svg" src="https://zenodo.org/badge/337030866.svg" /><dl class="field-list simple">
+<dt class="field-odd">target</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://zenodo.org/badge/latestdoi/337030866">https://zenodo.org/badge/latestdoi/337030866</a></p>
+</dd>
+</dl>
+<p>Here we provide a description of the different classes used to build
+and evaluate the RBF surrogate models. Two different
+kernel functions <span class="math notranslate nohighlight">\(\phi(r)\)</span> are defined in the code, the Exponential
+kernel (<a class="reference internal" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential" title="RONAALP.utilities.kernels.exponential.RBF_Exponential"><code class="xref py py-class docutils literal notranslate"><span class="pre">RBF_Exponential</span></code></a>, ,
+the Spline kernel (<a class="reference internal" href="#RONAALP.utilities.kernels.spline.RBF_Spline" title="RONAALP.utilities.kernels.spline.RBF_Spline"><code class="xref py py-class docutils literal notranslate"><span class="pre">RBF_Spline</span></code></a>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of these classes solves the system <span class="math notranslate nohighlight">\(A s = F\)</span>.
+In the case of RBF interpolants, the vector <span class="math notranslate nohighlight">\(F\)</span> contains the values
+of the function where the points have been evaluated and the matrix <span class="math notranslate nohighlight">\(A\)</span>
+is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A = \begin{bmatrix}
+        \Phi &amp; P \\
+        P^T &amp; 0.
+    \end{bmatrix}\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(\Phi\)</span> is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\Phi_{i,j} = \phi(r_{i,j}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(r_{i,j} = \left \| x^i-x^j \right\|\)</span> is the Euclidean distance
+between the points <span class="math notranslate nohighlight">\(x^i\)</span> and <span class="math notranslate nohighlight">\(x^j\)</span>.</p>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method has been used to build the surrogate model, it is possible
+to evaluate points using the method <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>.</p>
+<p>If new points are generated, the</p>
+<div class="section" id="exponential-kernel">
+<h2>Exponential Kernel<a class="headerlink" href="#exponential-kernel" title="Permalink to this headline">¶</a></h2>
+<p>The Exponential Kernel is defined as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Phi(r) = \exp \left( -\dfrac{r^2}{2 l^2} \right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(l&gt;0\)</span> and <span class="math notranslate nohighlight">\(r=\|y-x\|\)</span>, where <span class="math notranslate nohighlight">\(\|\cdot\|\)</span> is the
+Euclidean norm.</p>
+<span class="target" id="module-RONAALP.utilities.kernels.exponential"></span><dl class="py class">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential">
+<em class="property">class </em><code class="sig-prename descclassname">RONAALP.utilities.kernels.exponential.</code><code class="sig-name descname">RBF_Exponential</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">epsilon</span><span class="o">=</span><span class="default_value">0.001</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential" title="Permalink to this definition">¶</a></dt>
+<dd><p>RBF Exponential kernel class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>l</strong><span class="classifier">float or ndarray, shape (m,), optional</span></dt><dd><p>Internal parameter. Width of the kernel.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float, optional</span></dt><dd><p>Smoothing parameter.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>l</strong><span class="classifier">float or ndarray, shape (m,)</span></dt><dd><p>Internal parameter. Width of the kernel.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">ndarray, shape(m,)</span></dt><dd><p>RBF coefficients.</p>
+</dd>
+<dt><strong>x</strong><span class="classifier">ndarray, shape (m,d,)</span></dt><dd><p>Array of points where function values are known. m is the
+number of sampling points and d is the number of dimensions.</p>
+</dd>
+<dt><strong>f</strong><span class="classifier">ndarray, shape (m,p,)</span></dt><dd><p>Array of function values at <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate surrogate model at given points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>y</strong><span class="classifier">ndarray, shape (n,d,)</span></dt><dd><p>Array of points where we want to evaluate the surrogate model.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>f</strong><span class="classifier">ndarray, shape(n,)</span></dt><dd><p>Array of interpolated values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build surrogate model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">ndarray, shape (m,d,)</span></dt><dd><p>Array of points where function values are known. m is the
+number of sampling points and d is the number of dimensions.</p>
+</dd>
+<dt><strong>f</strong><span class="classifier">ndarray, shape (m,p)</span></dt><dd><p>Array of function values at <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Phi</strong><span class="classifier">ndarray, shape(m,m,)</span></dt><dd><p>RBF matrix.</p>
+</dd>
+<dt><strong>A</strong><span class="classifier">ndarray, shape(m*(d+1),m*(d+1),)</span></dt><dd><p>RBF matrix with linear polynomial terms.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential.retrain">
+<code class="sig-name descname">retrain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_new</span></em>, <em class="sig-param"><span class="n">f_new</span></em>, <em class="sig-param"><span class="n">l_new</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential.retrain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential.retrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrain the surrogate model in a brute force approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x_new</strong><span class="classifier">ndarray, shape (m2,d,)</span></dt><dd><p>New array of points where function values are known. m2 is the number of new sampling points.</p>
+</dd>
+<dt><strong>f_new</strong><span class="classifier">ndarray, shape (m2,p)</span></dt><dd><p>Array of new function values at <code class="docutils literal notranslate"><span class="pre">x_new</span></code>.</p>
+</dd>
+<dt><strong>l_new</strong><span class="classifier">float or ndarray, shape (m2,)</span></dt><dd><p>Internal parameter. Width of the kernel on this new points.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential.retrain_schur">
+<code class="sig-name descname">retrain_schur</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_new</span></em>, <em class="sig-param"><span class="n">f_new</span></em>, <em class="sig-param"><span class="n">l_new</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential.retrain_schur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential.retrain_schur" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently retrain the surrogate model using the Schur complement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x_new</strong><span class="classifier">ndarray, shape (m2,d,)</span></dt><dd><p>New array of points where function values are known. m2 is the number of new sampling points.</p>
+</dd>
+<dt><strong>f_new</strong><span class="classifier">ndarray, shape (m2,p)</span></dt><dd><p>Array of new function values at <code class="docutils literal notranslate"><span class="pre">x_new</span></code>.</p>
+</dd>
+<dt><strong>l_new</strong><span class="classifier">float or ndarray, shape (m2,)</span></dt><dd><p>Internal parameter. Width of the kernel on this new points.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.exponential.RBF_Exponential.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/exponential.html#RBF_Exponential.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.exponential.RBF_Exponential.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update internal parameters of the kernel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>l</strong><span class="classifier">float or ndarray, shape (d,), optional</span></dt><dd><p>Internal parameter. Width of the kernel.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="spline-kernel">
+<h2>Spline Kernel<a class="headerlink" href="#spline-kernel" title="Permalink to this headline">¶</a></h2>
+<p>The thin-plate spline kernel is defined as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Phi(r) = r^2 \log \left(r\right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(r=\|y-x\|\)</span>, where <span class="math notranslate nohighlight">\(\|\cdot\|\)</span> is the Euclidean norm.</p>
+<p>The first derivative of the Matérn Kernel with respect to the
+distance is defined as:</p>
+<span class="target" id="module-RONAALP.utilities.kernels.spline"></span><dl class="py class">
+<dt id="RONAALP.utilities.kernels.spline.RBF_Spline">
+<em class="property">class </em><code class="sig-prename descclassname">RONAALP.utilities.kernels.spline.</code><code class="sig-name descname">RBF_Spline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">epsilon</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">degree</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">phi_min</span><span class="o">=</span><span class="default_value">0.005</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#RBF_Spline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.RBF_Spline" title="Permalink to this definition">¶</a></dt>
+<dd><p>RBF thinplate spline kernel class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>degree</strong><span class="classifier">int, default = 1</span></dt><dd><p>Highest degree of added polynomial terms.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float, default = 1e-3</span></dt><dd><p>Smoothing parameter.</p>
+</dd>
+<dt><strong>phi_min</strong><span class="classifier">float, default = 5e-3</span></dt><dd><p>Distance threshold for extrapolation detection.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>s</strong><span class="classifier">ndarray, shape(m+monomes(degree),)</span></dt><dd><p>RBF coefficients: first m coefficients correspond to each kernel, followed by monomes(degree) coeffiecients for polynomial terms.</p>
+</dd>
+<dt><strong>x</strong><span class="classifier">ndarray, shape (m,d,)</span></dt><dd><p>Array of points where function values are known. m is the number of sampling points and d is the number of dimensions.</p>
+</dd>
+<dt><strong>f</strong><span class="classifier">ndarray, shape (m,p,)</span></dt><dd><p>Array of function values at <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+<dt><strong>f0</strong><span class="classifier">ndarray, shape (m+monomes(degree),p,)</span></dt><dd><p>Array of function values at <code class="docutils literal notranslate"><span class="pre">x</span></code> supplemented with zeros for polyharmonic terms.</p>
+</dd>
+<dt><strong>Kinv</strong><span class="classifier">ndarray, shape (m,m,)</span></dt><dd><p>Inverse of the RBF kernel matrix Phi.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.spline.RBF_Spline.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#RBF_Spline.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.RBF_Spline.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate surrogate model at given points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>y</strong><span class="classifier">ndarray, shape (n,d,)</span></dt><dd><p>Array of points where we want to evaluate the surrogate model.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>f</strong><span class="classifier">ndarray, shape(n,p,)</span></dt><dd><p>Array of interpolated values.</p>
+</dd>
+<dt>extrp: ndarray, shape(n,)</dt><dd><dl class="simple">
+<dt>Array of extrapolation flag:</dt><dd><p>0 -&gt; interpolation,
+1 -&gt; extrapolation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.spline.RBF_Spline.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#RBF_Spline.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.RBF_Spline.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build surrogate model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">ndarray, shape (m,d,)</span></dt><dd><p>Array of points where function values are known. m is the
+number of sampling points and d is the number of dimensions.</p>
+</dd>
+<dt><strong>f</strong><span class="classifier">ndarray, shape (m,p)</span></dt><dd><p>Array of function values at <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Phi</strong><span class="classifier">ndarray, shape(m,m,)</span></dt><dd><p>RBF matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.spline.RBF_Spline.retrain">
+<code class="sig-name descname">retrain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_new</span></em>, <em class="sig-param"><span class="n">f_new</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#RBF_Spline.retrain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.RBF_Spline.retrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrain the surrogate model in a brute force approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x_new</strong><span class="classifier">ndarray, shape (m2,d,)</span></dt><dd><p>New array of points where function values are known. m2 is the number of new sampling points.</p>
+</dd>
+<dt><strong>f_new</strong><span class="classifier">ndarray, shape (m2,p)</span></dt><dd><p>Array of new function values at <code class="docutils literal notranslate"><span class="pre">x_new</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="RONAALP.utilities.kernels.spline.RBF_Spline.retrain_schur">
+<code class="sig-name descname">retrain_schur</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_new</span></em>, <em class="sig-param"><span class="n">f_new</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#RBF_Spline.retrain_schur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.RBF_Spline.retrain_schur" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently retrain the surrogate model using the Schur complement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x_new</strong><span class="classifier">ndarray, shape (m2,d,)</span></dt><dd><p>New array of points where function values are known. m2 is the number of new sampling points.</p>
+</dd>
+<dt><strong>f_new</strong><span class="classifier">ndarray, shape (m2,p)</span></dt><dd><p>Array of new function values at <code class="docutils literal notranslate"><span class="pre">x_new</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="RONAALP.utilities.kernels.spline.monomial_powers">
+<code class="sig-prename descclassname">RONAALP.utilities.kernels.spline.</code><code class="sig-name descname">monomial_powers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ndim</span></em>, <em class="sig-param"><span class="n">degree</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#monomial_powers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.monomial_powers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the powers for each monomial in a polynomial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ndim</strong><span class="classifier">int</span></dt><dd><p>Number of variables in the polynomial.</p>
+</dd>
+<dt><strong>degree</strong><span class="classifier">int</span></dt><dd><p>Degree of the polynomial.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>(nmonos, ndim) int ndarray</dt><dd><p>Array where each row contains the powers for each variable in a
+monomial.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="RONAALP.utilities.kernels.spline.polynomial_matrix">
+<code class="sig-prename descclassname">RONAALP.utilities.kernels.spline.</code><code class="sig-name descname">polynomial_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">powers</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/utilities/kernels/spline.html#polynomial_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.utilities.kernels.spline.polynomial_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate monomials, with exponents from <cite>powers</cite>, at <cite>x</cite>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clement Scherding.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

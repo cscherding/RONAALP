@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RONAALP.RONAALP &mdash; RONAALP  documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            RONAALP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../RONAALP.html">RONAALP Algorithm</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RONAALP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">RONAALP.RONAALP</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for RONAALP.RONAALP</h1><div class="highlight"><pre>
+<span></span><span class="c1"># IMPORTING MODULES</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="kn">import</span> <span class="n">euclidean_distances</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+
+<span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">InputLayer</span>
+
+<span class="kn">from</span> <span class="nn">.utilities.kernels</span> <span class="kn">import</span> <span class="n">RBF_Exponential</span><span class="p">,</span> <span class="n">RBF_Spline</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">clustering_newman</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">K_Means</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">create_autoencoder</span>
+
+<span class="n">METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Exponential&quot;</span><span class="p">,</span> <span class="s2">&quot;Spline&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Ronaalp"><a class="viewcode-back" href="../../RONAALP.html#RONAALP.Ronaalp">[docs]</a><span class="k">class</span> <span class="nc">Ronaalp</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reduced Order Nonlinear Approximation with Active Learning Procedure.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    d : int, default = 2</span>
+<span class="sd">            Dimension of the latent space.</span>
+<span class="sd">    feat_min : float, default = 0</span>
+<span class="sd">            Minimum value for MinMaxScaling.</span>
+<span class="sd">    feat_max : float, default = 1</span>
+<span class="sd">            Maximum value for MinMaxScaling.</span>
+<span class="sd">    n_tree : int, default = 20</span>
+<span class="sd">            Number of trees in RandomForest classifier.</span>
+<span class="sd">    n_ghost : int, default = 1000</span>
+<span class="sd">            Number of neighboring point to add to build the ghost layer of each cluster</span>
+<span class="sd">    n_rbf : int, default = 200</span>
+<span class="sd">            Number of kernels in each clusters.</span>
+
+<span class="sd">    method : str, optional</span>
+<span class="sd">            Kernel function to be used for RBF. Should be:</span>
+<span class="sd">            - &#39;Exponential&#39;   : exponential kernel exp(-r^2/l)</span>
+<span class="sd">            - &#39;Spline&#39;        : thin-plate spline kernel r^2*log(r)</span>
+<span class="sd">    rbf_degree : int, default = 3</span>
+<span class="sd">            Highest degree of added polynomial terms for RBF. Only used when method=&#39;Spline&#39;</span>
+<span class="sd">    rbf_smoothing : float, default = 1e-3</span>
+<span class="sd">            Smoothing parameter for RBF.</span>
+
+<span class="sd">    architecture : list, default = [12,6]</span>
+<span class="sd">        A list specifying the number of neurons in each</span>
+<span class="sd">        hidden layer for the encoding and decoding parts.</span>
+<span class="sd">    clustering : boolean, default = True</span>
+<span class="sd">        Specify if the user wants to perform Newman clustering in the latent space.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    scaler_x : MinMaxScaler object</span>
+<span class="sd">        Scaler for input data.</span>
+<span class="sd">    scaler_y : MinMaxScaler object</span>
+<span class="sd">        Scaler for latent space.</span>
+<span class="sd">    scaler_z : MinMaxScaler object</span>
+<span class="sd">        Scaler for output data.</span>
+
+<span class="sd">    encoder: Keras neural network.</span>
+<span class="sd">        Deep encoder to project high-dimensional input data in low-dimensional latent space.</span>
+
+<span class="sd">    n_clusters: int</span>
+<span class="sd">        Number of clusters found by Newman algorithm in the latent space.</span>
+<span class="sd">    classifier: Scikit-learn random forest classifier</span>
+<span class="sd">        Classifier trained on Newman clusters.</span>
+
+<span class="sd">    kmeans_list: list of length n_clusters</span>
+<span class="sd">        List containing the kmeans objects of each cluster.</span>
+
+<span class="sd">    surrogate_list: list of length n_clusters</span>
+<span class="sd">        List containing the RBF surrogate models of each cluster.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Scherding, C., Rigas, G., Sipp, D., Schmid, P. J., &amp; Sayadi, T. (2023). Data-driven framework for input/output lookup tables reduction: Application to hypersonic flows in chemical nonequilibrium. Physical Review Fluids, 8(2), 023201.</span>
+<span class="sd">    .. [2] Scherding, C. (2023). Predictive modeling of hypersonic flows in thermochemical nonequilibrium: physics-based and data-driven approaches. PhD Thesis, Sorbone University.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">d</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">feat_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">feat_max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Spline&quot;</span><span class="p">,</span>
+        <span class="n">n_rbf</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">n_ghost</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">n_tree</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">rbf_degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">rbf_smoothing</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+        <span class="n">n_epochs</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">architecture</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="n">clustering</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">METHODS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;invalid method </span><span class="si">%s</span><span class="s2">,</span><span class="se">\n</span><span class="s2">  valid options are </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">feat_min</span><span class="p">,</span> <span class="n">feat_max</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_tree</span> <span class="o">=</span> <span class="n">n_tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_rbf</span> <span class="o">=</span> <span class="n">n_rbf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_ghost</span> <span class="o">=</span> <span class="n">n_ghost</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_degree</span> <span class="o">=</span> <span class="n">rbf_degree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rbf_smoothing</span> <span class="o">=</span> <span class="n">rbf_smoothing</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kmeans_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering</span> <span class="o">=</span> <span class="n">clustering</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">z_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">z_test</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Train the model to find a reduced-order representation of the high-dimensional mapping between ``x_train`` and ``z_train`` in a latent space of dimension ``d`` with ``n_clusters`` distinct clusters .</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_train : ndarray, shape (m,D,)</span>
+<span class="sd">            Array of points where function values are known. m is the</span>
+<span class="sd">            number of sampling points and D is the number of input dimensions.</span>
+<span class="sd">        z_train : ndarray, shape (m,P,)</span>
+<span class="sd">            Array of function values at ``x_train``. P is the number of output dimensions.</span>
+
+<span class="sd">        x_test : ndarray, shape (_,D,)</span>
+<span class="sd">             Similar as ``x_train`` but for testing.</span>
+<span class="sd">        z_test : ndarray, shape (_,P,)</span>
+<span class="sd">             Similar as ``z_train`` but for testing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># 0. set # of input/output features</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="n">z_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># 1. scale data</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Setting up scalers ...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler_x</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feat_range</span><span class="p">)</span>
+
+        <span class="n">x_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_x</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="n">x_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_x</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler_z</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feat_range</span><span class="p">)</span>
+
+        <span class="n">z_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_z</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">z_train</span><span class="p">)</span>
+        <span class="n">z_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_z</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">z_test</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 2. Train deep encoder</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Training encoder, latent space dimenion  d = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; ...&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">:</span>
+            <span class="c1"># Create autoencoder based on architecture parameter</span>
+            <span class="n">autoencoder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">create_autoencoder</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span>
+            <span class="p">)</span>
+            <span class="n">autoencoder</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Train autoencoder</span>
+            <span class="n">autoencoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+                <span class="n">x_train</span><span class="p">,</span>
+                <span class="n">z_train</span><span class="p">,</span>
+                <span class="n">epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">z_test</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If latent dimension is equal to input dimension, an identity model is created</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">InputLayer</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">,)))</span>
+
+        <span class="c1"># Scaler for latent space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler_y</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feat_range</span><span class="p">)</span>
+
+        <span class="n">y_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 3. Find spectral clusters in the latent space</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Find spectral clusters in the latent space ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Sample points in the latent space,</span>
+        <span class="c1"># capped at 10000 due to the time-complexity</span>
+        <span class="c1"># of Newman clustering algorithm</span>
+
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">rand_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">y_newman</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">rand_index</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering</span><span class="p">:</span>
+            <span class="c1"># Build distance matrix</span>
+            <span class="n">A_in</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">y_newman</span><span class="p">,</span> <span class="n">y_newman</span><span class="p">)</span>
+
+            <span class="c1"># Threshold to build graph connectivity</span>
+            <span class="n">thres</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A_in</span><span class="p">)</span>
+
+            <span class="c1"># Apply clustering algorithm</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">Ci</span><span class="p">,</span> <span class="n">nci</span> <span class="o">=</span> <span class="n">clustering_newman</span><span class="p">(</span><span class="n">A_in</span><span class="p">,</span> <span class="n">thres</span><span class="p">)</span>
+
+            <span class="n">Ci</span> <span class="o">=</span> <span class="n">Ci</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">Ci</span> <span class="o">=</span> <span class="n">Ci</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">Ci</span> <span class="o">=</span> <span class="n">Ci</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Ci</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">))</span>
+            <span class="n">nci</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">=</span> <span class="n">nci</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 4. Train classifier</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Training classifier ...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tree</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_newman</span><span class="p">,</span> <span class="n">Ci</span><span class="p">)</span>
+
+        <span class="n">Ci_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 5. Find ghost layer of each cluster</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5. Creating ghost layers ...&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ghost_y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nci</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">):</span>
+                <span class="n">centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_train</span><span class="p">[</span><span class="n">Ci_train</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nci</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">i</span><span class="p">:</span>  <span class="c1"># Loop over other clusters</span>
+                        <span class="n">y_work</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">Ci_train</span> <span class="o">==</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span>
+
+                        <span class="c1"># Find nearest neighbors in that cluster</span>
+                        <span class="n">knn</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_ghost</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+                            <span class="n">y_work</span>
+                        <span class="p">)</span>
+                        <span class="n">indices</span> <span class="o">=</span> <span class="n">knn</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span>
+                            <span class="n">centroid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span>
+                        <span class="p">)[:,</span> <span class="p">:]</span>
+
+                        <span class="n">y_nn</span> <span class="o">=</span> <span class="n">y_work</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span>
+
+                        <span class="c1"># Check if they are adjacent clusters</span>
+
+                        <span class="n">A_dist</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">y_nn</span><span class="p">,</span> <span class="n">y_train</span><span class="p">[</span><span class="n">Ci_train</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+
+                        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">A_dist</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-2</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ghost_y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                                <span class="n">ghost_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_nn</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">ghost_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                                    <span class="p">(</span><span class="n">ghost_y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_nn</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+                                <span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 6. Build surrogate model for each spectral cluster</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;6. Building RBFs ...&quot;</span><span class="p">)</span>
+        <span class="n">nc_rbf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_rbf</span>
+
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">):</span>
+            <span class="c1"># If more than one cluster, append ghost layer</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">n_ghost</span> <span class="o">=</span> <span class="n">ghost_y</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">XY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">y_train</span><span class="p">[</span><span class="n">Ci_train</span> <span class="o">==</span> <span class="n">ic</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ghost_y</span><span class="p">[</span><span class="n">ic</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">XY</span> <span class="o">=</span> <span class="n">y_train</span>
+                <span class="n">n_ghost</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Construct cluster tessalation for RBF using custom K_Means class based on scikit-learn kmeans</span>
+
+            <span class="n">kmeans</span> <span class="o">=</span> <span class="n">K_Means</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">nc_rbf</span><span class="p">)</span>
+            <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">XY</span><span class="p">)</span>
+
+            <span class="n">Centroids</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">centroids</span>
+
+            <span class="c1"># Replace centroid by closest representation in training data for a cheap &#39;k-medoid&#39; alternative.</span>
+
+            <span class="n">nn</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">Centroids</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">x_centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="n">y_centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">y_train</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="n">z_centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">z_train</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:])</span>
+
+            <span class="c1"># Initialize and train RBF</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Exponential&quot;</span><span class="p">:</span>
+                <span class="c1"># internal parameter is set to mean inter-center distance</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">euclidean_distances</span><span class="p">(</span><span class="n">y_centroids</span><span class="p">,</span> <span class="n">y_centroids</span><span class="p">))</span>
+
+                <span class="n">surrogate</span> <span class="o">=</span> <span class="n">RBF_Exponential</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rbf_smoothing</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Spline&quot;</span><span class="p">:</span>
+                <span class="n">surrogate</span> <span class="o">=</span> <span class="n">RBF_Spline</span><span class="p">(</span>
+                    <span class="n">epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rbf_smoothing</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rbf_degree</span>
+                <span class="p">)</span>
+
+            <span class="n">surrogate</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_centroids</span><span class="p">,</span> <span class="n">z_centroids</span><span class="p">)</span>
+
+            <span class="c1"># Append objects to the cluster lists</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">kmeans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kmeans</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">surrogate</span><span class="p">)</span>
+
+        <span class="c1">####</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;... Done !&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the reduced-order model at given points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray, shape (n_state,D,)</span>
+<span class="sd">            Array of points where we want to evaluate the surrogate model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        z : ndarray, shape(n_state,P,)</span>
+<span class="sd">            Array of interpolated values at ``x``.</span>
+<span class="sd">        extrp_flag : ndarray, shape(n_state,)</span>
+<span class="sd">            Array of extrapolation flag at ``x``:</span>
+<span class="sd">                0=interpolation,</span>
+<span class="sd">                1=extrapolation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_state</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="p">))</span>
+        <span class="n">extrp_flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_state</span><span class="p">))</span>
+
+        <span class="c1"># 1. Scale X vector</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_x</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># 2. transform new point in embedded coordinates</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">n_state</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># 3. Call classifier</span>
+        <span class="n">c_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">c_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># 4. Call surrogate surface on each spectral cluster</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">c_index</span> <span class="o">==</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">z</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:],</span> <span class="n">extrp_flag</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="c1">####</span>
+        <span class="c1">####</span>
+
+        <span class="c1"># 5. Scale back thermochemical properties to physical units</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_z</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">extrp_flag</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">z_new</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrain the model by first tesselating the new points and then retraining the RBFs using the Schur complement technique.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_new : ndarray, shape (l,d,)</span>
+<span class="sd">            New array of points where function values are known. l is the number of new sampling points.</span>
+<span class="sd">        z_new : ndarray, shape (l,p)</span>
+<span class="sd">            Array of new function values at ``x_new``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># 1. scaling</span>
+
+        <span class="n">x_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_x</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+        <span class="n">z_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_z</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">z_new</span><span class="p">)</span>
+
+        <span class="c1"># 2. embedding</span>
+
+        <span class="n">y_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_new</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_y</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+
+        <span class="c1"># 3. classification</span>
+
+        <span class="n">c_edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+
+        <span class="c1"># 4. Loop over Newman&#39;s clusters for retrain</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">):</span>
+            <span class="c1"># 4.0 Get corresponding points</span>
+
+            <span class="n">x_edge</span> <span class="o">=</span> <span class="n">x_new</span><span class="p">[</span><span class="n">c_edge_index</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_edge</span> <span class="o">=</span> <span class="n">y_new</span><span class="p">[</span><span class="n">c_edge_index</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">z_edge</span> <span class="o">=</span> <span class="n">z_new</span><span class="p">[</span><span class="n">c_edge_index</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="n">x_edge</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rbf_retrain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">kmeans_retrain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kmeans_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                <span class="c1"># 4.1 Update kmeans centroids sequentially</span>
+
+                <span class="n">new_centroids</span> <span class="o">=</span> <span class="n">kmeans_retrain</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">y_edge</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">new_centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># 4.2 Find closest point in training set</span>
+
+                    <span class="n">nn</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_edge</span><span class="p">)</span>
+
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">new_centroids</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+                    <span class="c1"># 4.3 Get corresponding inputs/outputs</span>
+
+                    <span class="n">y_centers_retrain</span> <span class="o">=</span> <span class="n">y_edge</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span>
+                    <span class="n">z_centers_retrain</span> <span class="o">=</span> <span class="n">z_edge</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span>
+
+                    <span class="c1"># 4.4 Retrain RBF with Schur complement</span>
+
+                    <span class="n">rbf_retrain</span><span class="o">.</span><span class="n">retrain_schur</span><span class="p">(</span><span class="n">y_centers_retrain</span><span class="p">,</span> <span class="n">z_centers_retrain</span><span class="p">)</span>
+
+                    <span class="c1"># 5. update surrogate and kmeans objects</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">rbf_retrain</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kmeans_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">kmeans_retrain</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No edge state found in cluster #&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clement Scherding.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

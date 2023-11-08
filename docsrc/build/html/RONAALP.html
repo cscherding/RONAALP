@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RONAALP Algorithm &mdash; RONAALP  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Training" href="train.html" />
+    <link rel="prev" title="Reference documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RONAALP
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">RONAALP Algorithm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="train.html">Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluate.html">Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update.html">Update</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RONAALP</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">RONAALP Algorithm</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RONAALP.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ronaalp-algorithm">
+<h1>RONAALP Algorithm<a class="headerlink" href="#ronaalp-algorithm" title="Permalink to this headline">¶</a></h1>
+<p>Description of the RONAALP module to create a reduced-order model of a high dimensional nonlinear functions with active learning procedure.</p>
+<p>Mathematically, a RONAALP reduced-order model <span class="math notranslate nohighlight">\(g\)</span> predicts the outputs of the function of interest <span class="math notranslate nohighlight">\(f\)</span> such that <span class="math notranslate nohighlight">\(\lVert g({\mathbf{z}}) - f(\mathbf{z}) \rVert_2\)</span> is minimized and the computational cost is significantly reduced compared to the original function. The strategy employed to derive the reduced-order model is presented in [1], [2].</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="train.html">Training</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="encoder.html">Encoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newman.html">Newman’s clustering algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kmeans.html">K-Means</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html">Kernel functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kernels.html#exponential-kernel">Exponential Kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.html#spline-kernel">Spline Kernel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="evaluate.html">Evaluate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update.html">Update</a></li>
+</ul>
+</div>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets">1</span></dt>
+<dd><p>Scherding, C., Rigas, G., Sipp, D., Schmid, P. J., &amp; Sayadi, T. (2023). Data-driven framework for input/output lookup tables reduction: Application to hypersonic flows in chemical nonequilibrium. Physical Review Fluids, 8(2), 023201.</p>
+</dd>
+<dt class="label" id="id2"><span class="brackets">2</span></dt>
+<dd><p>Scherding, C. (2023). Predictive modeling of hypersonic flows in thermochemical nonequilibrium: physics-based and data-driven approaches. PhD Thesis, Sorbone University.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="RONAALP.Ronaalp">
+<code class="sig-prename descclassname">RONAALP.</code><code class="sig-name descname">Ronaalp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">feat_min</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">feat_max</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'Spline'</span></em>, <em class="sig-param"><span class="n">n_rbf</span><span class="o">=</span><span class="default_value">200</span></em>, <em class="sig-param"><span class="n">n_ghost</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">n_tree</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">rbf_degree</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">rbf_smoothing</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">n_epochs</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">architecture</span><span class="o">=</span><span class="default_value">[12, 6]</span></em>, <em class="sig-param"><span class="n">clustering</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/RONAALP/RONAALP.html#Ronaalp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#RONAALP.Ronaalp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduced Order Nonlinear Approximation with Active Learning Procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>d</strong><span class="classifier">int, default = 2</span></dt><dd><p>Dimension of the latent space.</p>
+</dd>
+<dt><strong>feat_min</strong><span class="classifier">float, default = 0</span></dt><dd><p>Minimum value for MinMaxScaling.</p>
+</dd>
+<dt><strong>feat_max</strong><span class="classifier">float, default = 1</span></dt><dd><p>Maximum value for MinMaxScaling.</p>
+</dd>
+<dt><strong>n_tree</strong><span class="classifier">int, default = 20</span></dt><dd><p>Number of trees in RandomForest classifier.</p>
+</dd>
+<dt><strong>n_ghost</strong><span class="classifier">int, default = 1000</span></dt><dd><p>Number of neighboring point to add to build the ghost layer of each cluster</p>
+</dd>
+<dt><strong>n_rbf</strong><span class="classifier">int, default = 200</span></dt><dd><p>Number of kernels in each clusters.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str, optional</span></dt><dd><p>Kernel function to be used for RBF. Should be:
+- ‘Exponential’   : exponential kernel exp(-r^2/l)
+- ‘Spline’        : thin-plate spline kernel r^2*log(r)</p>
+</dd>
+<dt><strong>rbf_degree</strong><span class="classifier">int, default = 3</span></dt><dd><p>Highest degree of added polynomial terms for RBF. Only used when method=’Spline’</p>
+</dd>
+<dt><strong>rbf_smoothing</strong><span class="classifier">float, default = 1e-3</span></dt><dd><p>Smoothing parameter for RBF.</p>
+</dd>
+<dt><strong>architecture</strong><span class="classifier">list, default = [12,6]</span></dt><dd><p>A list specifying the number of neurons in each
+hidden layer for the encoding and decoding parts.</p>
+</dd>
+<dt><strong>clustering</strong><span class="classifier">boolean, default = True</span></dt><dd><p>Specify if the user wants to perform Newman clustering in the latent space.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r861af9403ea1-1"><span class="brackets">1</span></dt>
+<dd><p>Scherding, C., Rigas, G., Sipp, D., Schmid, P. J., &amp; Sayadi, T. (2023). Data-driven framework for input/output lookup tables reduction: Application to hypersonic flows in chemical nonequilibrium. Physical Review Fluids, 8(2), 023201.</p>
+</dd>
+<dt class="label" id="r861af9403ea1-2"><span class="brackets">2</span></dt>
+<dd><p>Scherding, C. (2023). Predictive modeling of hypersonic flows in thermochemical nonequilibrium: physics-based and data-driven approaches. PhD Thesis, Sorbone University.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>scaler_x</strong><span class="classifier">MinMaxScaler object</span></dt><dd><p>Scaler for input data.</p>
+</dd>
+<dt><strong>scaler_y</strong><span class="classifier">MinMaxScaler object</span></dt><dd><p>Scaler for latent space.</p>
+</dd>
+<dt><strong>scaler_z</strong><span class="classifier">MinMaxScaler object</span></dt><dd><p>Scaler for output data.</p>
+</dd>
+<dt><strong>encoder: Keras neural network.</strong></dt><dd><p>Deep encoder to project high-dimensional input data in low-dimensional latent space.</p>
+</dd>
+<dt><strong>n_clusters: int</strong></dt><dd><p>Number of clusters found by Newman algorithm in the latent space.</p>
+</dd>
+<dt><strong>classifier: Scikit-learn random forest classifier</strong></dt><dd><p>Classifier trained on Newman clusters.</p>
+</dd>
+<dt><strong>kmeans_list: list of length n_clusters</strong></dt><dd><p>List containing the kmeans objects of each cluster.</p>
+</dd>
+<dt><strong>surrogate_list: list of length n_clusters</strong></dt><dd><p>List containing the RBF surrogate models of each cluster.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Reference documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="train.html" class="btn btn-neutral float-right" title="Training" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clement Scherding.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

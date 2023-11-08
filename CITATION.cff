@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: DyCors
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - given-names: Clement
+    family-names: Scherding
+    email: >-
+      clement.scherding@dalembert.upmc.fr
+    affiliation: CNRS
+license: GPL-3.0
+version: 0.0.1
+doi: 10.5281/zenodo.5907690
